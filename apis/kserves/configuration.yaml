@@ -1,0 +1,14 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Configuration
+metadata:
+  name: helm-kserve
+  annotations:
+    meta.crossplane.io/maintainer: Hops Ops
+    meta.crossplane.io/source: github.com/hops-ops/helm-kserve
+    meta.crossplane.io/description: Crossplane configuration for deploying KServe via Helm.
+spec:
+  dependsOn:
+  - provider: xpkg.crossplane.io/crossplane-contrib/provider-helm
+    version: ">=v0.20.0"
+  - function: xpkg.crossplane.io/crossplane-contrib/function-auto-ready
+    version: ">=v0.6.0"

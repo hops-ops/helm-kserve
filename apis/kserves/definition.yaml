@@ -1,0 +1,84 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: kserves.helm.hops.ops.com.ai
+spec:
+  group: helm.hops.ops.com.ai
+  names:
+    kind: KServe
+    plural: kserves
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            required:
+            - clusterName
+            properties:
+              clusterName:
+                type: string
+                description: Name of the Kubernetes cluster.
+              namespace:
+                type: string
+                description: Namespace to deploy KServe into.
+                default: kserve
+              releaseName:
+                type: string
+                description: Helm release name. Defaults to XR name.
+              labels:
+                type: object
+                description: Labels to apply to all resources.
+                x-kubernetes-preserve-unknown-fields: true
+              deploymentMode:
+                type: string
+                description: KServe deployment mode (Serverless, RawDeployment, Standard).
+                default: Serverless
+                enum:
+                - Serverless
+                - RawDeployment
+                - Standard
+              values:
+                type: object
+                description: Helm values merged with defaults.
+                x-kubernetes-preserve-unknown-fields: true
+              overrideAllValues:
+                type: object
+                description: Helm values that replace all defaults.
+                x-kubernetes-preserve-unknown-fields: true
+              providerConfigRef:
+                type: object
+                description: Reference to the ProviderConfig.
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    default: ProviderConfig
+              managementPolicies:
+                type: array
+                description: Crossplane management policies.
+                items:
+                  type: string
+                default:
+                - "*"
+          status:
+            type: object
+            properties:
+              ready:
+                type: boolean
+                description: Whether KServe is ready.
+              release:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  ready:
+                    type: boolean

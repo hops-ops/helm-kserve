@@ -1,0 +1,56 @@
+# code: language=yaml
+#
+# Initialize $state from XR spec with computed defaults
+#
+
+{{- $xr := getCompositeResource . }}
+{{- $spec := $xr.spec }}
+{{- $name := $xr.metadata.name }}
+
+# ==============================================================================
+# Compute effective spec with defaults
+# ==============================================================================
+
+{{- $clusterName := $spec.clusterName }}
+{{- $namespace := $spec.namespace | default "kserve" }}
+{{- $releaseName := $spec.releaseName | default $name }}
+{{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
+{{- $deploymentMode := $spec.deploymentMode | default "Serverless" }}
+
+# Provider config - defaults to clusterName
+{{- $providerConfigRef := $spec.providerConfigRef | default dict }}
+{{- $providerConfigName := $providerConfigRef.name | default $clusterName }}
+{{- $providerConfigKind := $providerConfigRef.kind | default "ProviderConfig" }}
+
+# Labels - merge user labels with defaults
+{{- $defaultLabels := dict
+  "hops.ops.com.ai/managed" "true"
+  "hops.ops.com.ai/kserve" $name
+}}
+{{- $userLabels := $spec.labels | default dict }}
+{{- $labels := merge $userLabels $defaultLabels }}
+
+# Helm values
+{{- $values := $spec.values | default dict }}
+{{- $overrideAllValues := $spec.overrideAllValues | default dict }}
+
+# ==============================================================================
+# Build effective spec
+# ==============================================================================
+{{- $effective := dict
+  "name" $name
+  "clusterName" $clusterName
+  "namespace" $namespace
+  "releaseName" $releaseName
+  "managementPolicies" $managementPolicies
+  "deploymentMode" $deploymentMode
+  "providerConfigRef" (dict "name" $providerConfigName "kind" $providerConfigKind)
+  "labels" $labels
+  "values" $values
+  "overrideAllValues" $overrideAllValues
+}}
+
+# ==============================================================================
+# Initialize $state
+# ==============================================================================
+{{- $state := dict "spec" (dict "effective" $effective) "observed" dict }}

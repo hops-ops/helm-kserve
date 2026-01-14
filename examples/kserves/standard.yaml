@@ -1,0 +1,19 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: KServe
+metadata:
+  name: kserve
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  namespace: kserve
+  deploymentMode: RawDeployment
+  labels:
+    team: ml-platform
+    environment: staging
+  values:
+    kserve:
+      controller:
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"

@@ -1,0 +1,39 @@
+# code: language=yaml
+#
+# Helm release for KServe
+#
+# KServe is a standardized serverless ML inference platform on Kubernetes,
+# built for highly scalable predictive and generative AI use cases.
+#
+
+{{- $ks := $state.kserve }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $ks.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-kserve" }}
+  labels: {{ $ks.labels | toJson }}
+spec:
+  managementPolicies: {{ $ks.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: kserve
+      repository: oci://ghcr.io/kserve/charts
+      version: v0.16.0
+    namespace: {{ $ks.namespace }}
+    {{- if $ks.overrideAllValues }}
+    values:
+      {{- toYaml $ks.overrideAllValues | nindent 6 }}
+    {{- else }}
+    {{- $defaultValues := dict "kserve" (dict "controller" (dict "deploymentMode" $ks.deploymentMode)) }}
+    {{- $mergedValues := merge $ks.values $defaultValues }}
+    values:
+      {{- toYaml $mergedValues | nindent 6 }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $ks.providerConfigRef.name }}
+    kind: {{ $ks.providerConfigRef.kind }}
