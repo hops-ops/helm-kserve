@@ -1,5 +1,0 @@
-apiVersion: v2
-name: helm-kserve
-version: 0.0.0
-description: GitOps packaging for the kserve Crossplane configuration
-appVersion: v0.16.0

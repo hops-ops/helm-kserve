@@ -11,7 +11,7 @@ spec:
   - apiVersion: pkg.crossplane.io/v1
     kind: Provider
     package: xpkg.crossplane.io/crossplane-contrib/provider-helm
-    version: '>=v0.20.0'
+    version: ">=v1"
   description: Crossplane configuration for deploying KServe via Helm.
   license: Apache-2.0
   maintainer: Hops Ops <hello@hops.ops.com.ai>
